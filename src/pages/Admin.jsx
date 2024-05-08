@@ -4,6 +4,18 @@ import ViewModal from "../components/ViewModal";
 
 function Admin() {
   const [loaRequests, setLoaRequests] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const [showLoaRequestForm, setShowLoaRequestForm] = useState({
+    idNumber: "",
+    hospitalName: "",
+    complaintType: "",
+    companyName: "",
+    memberName: "",
+    email: "",
+    landline: "",
+    mobileNumber: "",
+  });
 
   const columns = [
     { name: "ID Number" },
@@ -12,15 +24,49 @@ function Admin() {
     { name: "Company Name" },
     { name: "Member Name" },
     { name: "Email" },
-    { name: "Landline" },
-    { name: "Mobile Number" },
   ];
+
+  const handleViewModal = () => {
+    setIsModalVisible(!isModalVisible);
+  };
+
+  const updateStateFromChild = (booleanValue) => {
+    setIsModalVisible(booleanValue);
+  };
 
   const fetchAllRequests = async () => {
     await axios
-      .get("http://127.0.0.1:8000/api/loa_request")
+      .get(
+        "http://127.0.0.1:8000/api/loa_request"
+        // "https://api.loa.getwellhealthinc.com.ph/loa-request-api/public/api/loa_request"
+      )
       .then((response) => {
         setLoaRequests(response.data.data);
+      })
+      .catch((error) => {
+        console.log(error.response);
+      });
+  };
+
+  const fetchLoaRequestById = async (id) => {
+    await axios
+      .get(
+        `http://127.0.0.1:8000/api/loa_request/${id}`
+        // `https://api.loa.getwellhealthinc.com.ph/loa-request-api/public/api/loa_request/${id}`
+      )
+      .then((response) => {
+        handleViewModal();
+        setShowLoaRequestForm({
+          ...showLoaRequestForm,
+          idNumber: response.data.data.id_number,
+          hospitalName: response.data.data.hospital_name,
+          complaintType: response.data.data.complaint,
+          companyName: response.data.data.company_name,
+          memberName: response.data.data.member_name,
+          email: response.data.data.email,
+          landline: response.data.data.landline,
+          mobileNumber: response.data.data.mobile_number,
+        });
       });
   };
 
@@ -28,7 +74,7 @@ function Admin() {
     fetchAllRequests();
   }, []);
 
-  useEffect(() => {}, [loaRequests]);
+  useEffect(() => {}, [loaRequests, showLoaRequestForm]);
 
   console.log(loaRequests);
 
@@ -82,16 +128,12 @@ function Admin() {
                 </td>
                 <td className="px-6 py-4 text-center">{request.member_name}</td>
                 <td className="px-6 py-4 text-center">{request.email}</td>
-                <td className="px-6 py-4 text-center">{request.landline}</td>
-                <td className="px-6 py-4 text-center">
-                  {request.mobile_number}
-                </td>
                 <td className="px-6 py-4 text-center">
                   <a
-                    href="#"
+                    onClick={() => fetchLoaRequestById(request.id)}
                     type="button"
                     data-modal-show="editUserModal"
-                    className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                    className="font-medium text-blue-600 dark:text-blue-500 hover:underline cursor-pointer"
                   >
                     View
                   </a>
@@ -103,7 +145,14 @@ function Admin() {
       </div>
 
       {/* View Modal */}
-      <ViewModal />
+      {isModalVisible === true ? (
+        <ViewModal
+          updateStateFromChild={updateStateFromChild}
+          showLoaRequestForm={showLoaRequestForm}
+        />
+      ) : (
+        <></>
+      )}
     </main>
   );
 }
