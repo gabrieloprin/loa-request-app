@@ -1,10 +1,9 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Swal from "sweetalert2";
 import Toast from "../utils/toast";
 import showLoadingPopup from "../utils/showLoadingPopup";
 import hospitals from "../json/hospitalsData.json";
-import Select from "react-select";
 
 function LoaRequestForm() {
   const [formData, setFormData] = useState({
@@ -23,7 +22,8 @@ function LoaRequestForm() {
   const complaintTypes = [
     { name: "Consult", value: "Consult" },
     { name: "Lab Diagnosis", value: "Lab Diagnosis" },
-    { name: "Procedure", value: "Procedure" },
+    { name: "In-Patient", value: "In-Patient" },
+    { name: "Out-Patient", value: "Out-Patient" },
   ];
 
   const handleSubmitFormData = async (event) => {
@@ -41,7 +41,7 @@ function LoaRequestForm() {
           headers: headers,
         }
       )
-      .then(() => {
+      .then(async () => {
         Swal.close();
         setFormData({
           ...formData,
@@ -54,21 +54,19 @@ function LoaRequestForm() {
           landline: "",
           mobileNumber: "",
         });
-        Toast.fire({
+        await Toast.fire({
           icon: "success",
           title: "Successfully sent!",
         });
       })
-      .catch(() => {
+      .catch(async () => {
         Swal.close();
-        Toast.fire({
+        await Toast.fire({
           icon: "error",
           title: "Something went wrong.",
         });
       });
   };
-
-  console.log(formData);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center">
@@ -109,6 +107,7 @@ function LoaRequestForm() {
                   <input
                     type="text"
                     name="id-number"
+                    value={formData.idNumber}
                     onChange={(event) => {
                       setFormData({
                         ...formData,
@@ -133,6 +132,7 @@ function LoaRequestForm() {
                   <select
                     type="text"
                     name="hospital-name"
+                    value={formData.hospitalName}
                     onChange={(event) => {
                       setFormData({
                         ...formData,
@@ -163,6 +163,7 @@ function LoaRequestForm() {
                 <div className="mt-2">
                   <select
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-getwellGreen-600 sm:text-sm sm:leading-6"
+                    value={formData.complaintType}
                     onChange={(event) => {
                       setFormData({
                         ...formData,
@@ -191,6 +192,7 @@ function LoaRequestForm() {
                   <input
                     type="text"
                     name="company-name"
+                    value={formData.companyName}
                     onChange={(event) => {
                       setFormData({
                         ...formData,
@@ -215,6 +217,7 @@ function LoaRequestForm() {
                   <input
                     type="text"
                     name="member-name"
+                    value={formData.memberName}
                     onChange={(event) => {
                       setFormData({
                         ...formData,
@@ -239,6 +242,7 @@ function LoaRequestForm() {
                   <input
                     type="text"
                     name="email"
+                    value={formData.email}
                     onChange={(event) => {
                       setFormData({
                         ...formData,
@@ -263,6 +267,7 @@ function LoaRequestForm() {
                   <input
                     type="text"
                     name="landline"
+                    value={formData.landline}
                     onChange={(event) => {
                       setFormData({
                         ...formData,
@@ -291,6 +296,7 @@ function LoaRequestForm() {
                     <input
                       type="text"
                       name="mobile-number"
+                      value={formData.mobileNumber}
                       onChange={(event) => {
                         setFormData({
                           ...formData,
